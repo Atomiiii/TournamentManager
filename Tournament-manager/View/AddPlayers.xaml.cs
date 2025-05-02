@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tournament_manager.ViewModel;
 
 namespace Tournament_manager.Pages
 {
@@ -23,6 +24,13 @@ namespace Tournament_manager.Pages
         public Page1()
         {
             InitializeComponent();
+            AddPlayersViewModel viewModel = new AddPlayersViewModel();
+            DataContext = viewModel;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

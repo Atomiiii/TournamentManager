@@ -12,9 +12,9 @@
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
         <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ButtonBase.Click="Button_Click">
             <TextBlock Text="Tournament manager" FontSize="60" Margin="0,0,0,20"/>
-            <local:NavButton ButtonText="Swiss tournament" IsEnabled="True" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/Pages/AddPlayers.xaml"/>
-            <local:NavButton ButtonText="Single elimination (soon)" IsEnabled="False" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/Pages/AddPlayers.xaml"/>
-            <local:NavButton ButtonText="Swiss-Single elimination (soon)" IsEnabled="False" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/Pages/AddPlayers.xaml"/>
+            <local:NavButton ButtonText="Swiss tournament" IsEnabled="True" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/View/AddPlayers.xaml"/>
+            <local:NavButton ButtonText="Single elimination (soon)" IsEnabled="False" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/Pages/ViewPlayers.xaml"/>
+            <local:NavButton ButtonText="Swiss-Single elimination (soon)" IsEnabled="False" Background="LightGray" BorderBrush="Black" BorderThickness="1" Height="70" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" NavUri="/View/AddPlayers.xaml"/>
         </WrapPanel>
     </Grid>
 </Page>
