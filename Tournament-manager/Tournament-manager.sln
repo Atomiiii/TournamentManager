@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tournament-manager", "Tournament-manager.csproj", "{B8EE3F97-5B8A-1ED0-D610-3869A2E21841}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8EE3F97-5B8A-1ED0-D610-3869A2E21841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8EE3F97-5B8A-1ED0-D610-3869A2E21841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8EE3F97-5B8A-1ED0-D610-3869A2E21841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8EE3F97-5B8A-1ED0-D610-3869A2E21841}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54E6F177-3E4F-4CE5-AF54-F390C446ABA1}
+	EndGlobalSection
+EndGlobal
