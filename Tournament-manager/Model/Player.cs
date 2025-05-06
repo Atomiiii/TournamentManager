@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Tournament_manager.Model
 {
     public enum PlayerDivision
@@ -23,6 +18,8 @@ namespace Tournament_manager.Model
         public string Name { get; set; } = name;
         public PlayerDivision Division { get; set; } = division;
         public List<Result> results { get; set; } = new List<Result>();
+        public int score { get; set; } = 0;
         public List<Player> oponents { get; set; } = new List<Player>();
+        public bool hadBye { get; set; } = false;
     }
 }

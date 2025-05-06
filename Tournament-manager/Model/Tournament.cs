@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Tournament_manager.Model
 {
-    class Tournament
+    public class Tournament
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; } = "Tournament";
         public int RoundDurations { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
+        public List<Round> Rounds { get; set; } = new List<Round>();
     }
 }

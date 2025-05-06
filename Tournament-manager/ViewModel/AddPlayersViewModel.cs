@@ -18,9 +18,15 @@ namespace Tournament_manager.ViewModel
         private PlayerDivision selectedDivision;
         private string tournamentName;
         private int roundDuration;
+        private Tournament tournament = new Tournament { Id = DateTime.Now.ToString("s")};
 
         public ObservableCollection<Player> Players { get; set; } = new ObservableCollection<Player>();
 
+        public Tournament Tournament
+        {
+            get => tournament;
+            set { tournament = value; OnPropertyChanged(); }
+        }
         public string PlayerName
         {
             get => playerName;
@@ -49,11 +55,12 @@ namespace Tournament_manager.ViewModel
 
         public ICommand AddPlayerCommand { get; }
         public ICommand SaveTournamentCommand { get; }
+        public ICommand StartTournamentCommand { get; }
 
         public AddPlayersViewModel()
         {
             AddPlayerCommand = new RelayCommand(AddPlayer);
-            SaveTournamentCommand = new RelayCommand(SaveTournament);
+            StartTournamentCommand = new RelayCommand(StartTournament);
         }
 
         private void AddPlayer()
@@ -65,14 +72,18 @@ namespace Tournament_manager.ViewModel
             }
         }
 
-        private void SaveTournament()
+        public event Action<Tournament> TournamentStarted;
+
+        private void StartTournament()
         {
-            Tournament tournament = new Tournament
+            if (!string.IsNullOrWhiteSpace(TournamentName))
             {
-                Name = TournamentName,
-                RoundDurations = RoundDuration,
-                Players = Players.ToList()
-            };
+                Tournament.Name = TournamentName;
+                Tournament.RoundDurations = RoundDuration;
+                Tournament.Players = Players.ToList();
+                Tournament.Rounds.Add(RoundOne.MakeRoundOne(Tournament.Players));
+            TournamentStarted?.Invoke(Tournament);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

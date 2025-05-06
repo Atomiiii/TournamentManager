@@ -18,10 +18,12 @@
             <RowDefinition Height="50"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Grid Grid.Row="0" ButtonBase.Click="Button_Click">
+            <Button Content="Back" Command="NavigationCommands.BrowseBack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
+            <TextBlock Text="Players" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
-        <Button Content="Back" Command="NavigationCommands.BrowseBack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
-        <TextBlock Text="Players" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-
+        </Grid>
+        
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -47,17 +49,23 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <!-- Tournament Input -->
-                <StackPanel Grid.Row="0" Background="LightGray" Margin="10">
+                <StackPanel Grid.Row="2" Background="LightGray" Margin="10">
                     <Label Content="Tournament name" HorizontalAlignment="Center"/>
                     <TextBox Margin="5,0,5,10" Text="{Binding TournamentName, UpdateSourceTrigger=PropertyChanged}" />
                     <Label Content="Round time (minutes)" HorizontalAlignment="Center"/>
                     <TextBox Margin="5,0,5,10" Text="{Binding RoundDuration, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Content="Save" Command="{Binding SaveTournamentCommand}" HorizontalAlignment="Center" Width="100" Margin="0,15,0,0"/>
+                    <Button Content="Save and Start Tournament"
+                        Command="{Binding StartTournamentCommand}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="10"
+                        Background="LightGray"
+                        BorderBrush="Black"
+                        BorderThickness="1" 
+                    />
                 </StackPanel>
 
-                <!-- Add Player Input -->
-                <StackPanel Grid.Row="1" Margin="10">
+                <StackPanel Grid.Row="0" Margin="10">
                     <Label Content="Name" HorizontalAlignment="Center"/>
                     <TextBox Margin="5,0,5,10" Text="{Binding PlayerName, UpdateSourceTrigger=PropertyChanged}" />
                     <Label Content="Select division" HorizontalAlignment="Center"/>
@@ -69,8 +77,7 @@
                     <Button Content="Add player" Command="{Binding AddPlayerCommand}" HorizontalAlignment="Center" Width="100" Margin="0,15,0,0"/>
                 </StackPanel>
 
-                <!-- Optional: Preview List -->
-                <DataGrid Grid.Row="2"
+                <DataGrid Grid.Row="1"
                           ItemsSource="{Binding Players}"
                           AutoGenerateColumns="True"
                           CanUserAddRows="False"
