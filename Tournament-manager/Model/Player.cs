@@ -18,10 +18,10 @@ namespace Tournament_manager.Model
         Lose,
         Draw
     }
-    class Player
+    public class Player (string name, PlayerDivision division)
     {
-        public string Name { get; set; }
-        public PlayerDivision Division { get; set; }
+        public string Name { get; set; } = name;
+        public PlayerDivision Division { get; set; } = division;
         public List<Result> results { get; set; } = new List<Result>();
         public List<Player> oponents { get; set; } = new List<Player>();
     }

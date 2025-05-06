@@ -16,16 +16,12 @@ using Tournament_manager.ViewModel;
 
 namespace Tournament_manager.Pages
 {
-    /// <summary>
-    /// Interaction logic for Page1.xaml
-    /// </summary>
-    public partial class Page1 : Page
+    public partial class AddPlayersPage : Page
     {
-        public Page1()
+        public AddPlayersPage()
         {
             InitializeComponent();
-            AddPlayersViewModel viewModel = new AddPlayersViewModel();
-            DataContext = viewModel;
+            DataContext = new AddPlayersViewModel();
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
