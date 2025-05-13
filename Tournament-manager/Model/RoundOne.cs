@@ -20,6 +20,12 @@ namespace Tournament_manager.Model
                     Bye = true
                 };
                 round.Matches.Add(byeMatch);
+                round.Matches[0].Player1Result = Result.Win;
+                round.Matches[0].Player1Pts = 3;
+                round.Matches[0].Player1.Wins++;
+                round.Matches[0].Player1.Score += 3;
+                round.Matches[0].Player1.HadBye = true;
+                round.Matches[0].Player2Result = Result.Lose;
 
                 byeShift = 1;
             }
@@ -29,8 +35,10 @@ namespace Tournament_manager.Model
                 Match match = new Match
                 {
                     Player1 = players[i],
-                    Player2 = players[i*2]
+                    Player2 = players[((players.Count - byeShift) / 2) + i]
                 };
+                match.Player1.Oponents.Add(match.Player2);
+                match.Player2.Oponents.Add(match.Player1);
                 round.Matches.Add(match);
             }
             return round;

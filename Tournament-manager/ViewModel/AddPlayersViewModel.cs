@@ -1,26 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Tournament_manager.Helpers;
 using Tournament_manager.Model;
+using System.Text.Json;
+using System.IO;
 
 namespace Tournament_manager.ViewModel
 {
     public class AddPlayersViewModel : INotifyPropertyChanged
     {
+        // parameters
+        private readonly string savePlayersPath;
+
         private string playerName;
         private PlayerDivision selectedDivision;
         private string tournamentName;
         private int roundDuration;
-        private Tournament tournament = new Tournament { Id = DateTime.Now.ToString("s")};
+        private Tournament tournament = new Tournament { Id = DateTime.Now.ToString("s") };
 
         public ObservableCollection<Player> Players { get; set; } = new ObservableCollection<Player>();
+        public ObservableCollection<Player> LoadedPlayers { get; set; } = new ObservableCollection<Player>();
 
         public Tournament Tournament
         {
@@ -54,21 +55,88 @@ namespace Tournament_manager.ViewModel
         }
 
         public ICommand AddPlayerCommand { get; }
+        public ICommand SavePlayerCommand { get; }
+        public ICommand DeletePlayerCommand { get; }
         public ICommand SaveTournamentCommand { get; }
         public ICommand StartTournamentCommand { get; }
+        public ICommand DeleteLoadedPlayerCommand { get; }
+        public ICommand AddLoadedPlayerCommand { get; }
 
+        // constructor
         public AddPlayersViewModel()
         {
-            AddPlayerCommand = new RelayCommand(AddPlayer);
-            StartTournamentCommand = new RelayCommand(StartTournament);
+            var appDataPath = Path.Combine(
+                   Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                   "TournamentManager",
+                   "SavedPlayersData"
+               );
+            Directory.CreateDirectory(appDataPath);
+            savePlayersPath = Path.Combine(appDataPath, "players.json");
+
+
+            TournamentName = Tournament.Name;
+            RoundDuration = Tournament.RoundDurations;
+            List<Player> loadedPlayers = LoadPlayersAsync(savePlayersPath).Result;
+            LoadedPlayers = new ObservableCollection<Player>(loadedPlayers);
+
+            AddPlayerCommand = new RelayCommand(_ => AddPlayer());
+            DeletePlayerCommand = new RelayCommand(p => DeletePlayer(p as Player));
+            SavePlayerCommand = new RelayCommand(_ => SavePlayer());
+            StartTournamentCommand = new RelayCommand(_ => StartTournament());
+            DeleteLoadedPlayerCommand = new RelayCommand(p => DeleteLoadedPlayer(p as Player));
+            AddLoadedPlayerCommand = new RelayCommand(p => AddLoadedPlayer(p as Player));
         }
 
+        // methods
+        private void DeletePlayer(Player player)
+        {
+            if (player != null && Players.Contains(player))
+            {
+                Players.Remove(player);
+            }
+        }
+        private async void DeleteLoadedPlayer(Player player)
+        {
+            if (player != null)
+            {
+                LoadedPlayers.Remove(player);
+                string json = JsonSerializer.Serialize(LoadedPlayers);
+                await File.WriteAllTextAsync(savePlayersPath, json);
+            }
+        }
+        private void AddLoadedPlayer(Player player)
+        {
+            if (player != null && !Players.Contains(player))
+            {
+                Players.Add(player);
+            }
+        }
+
+        public static async Task<List<Player>> LoadPlayersAsync(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return new List<Player>();
+            }
+            string loadedData = File.ReadAllText(filePath);
+            return JsonSerializer.Deserialize<List<Player>>(loadedData) ?? new List<Player>();
+        }
         private void AddPlayer()
         {
             if (!string.IsNullOrWhiteSpace(PlayerName))
             {
                 Players.Add(new Player(PlayerName, SelectedDivision));
                 PlayerName = string.Empty;
+            }
+        }
+        private async void SavePlayer()
+        {
+            if (!string.IsNullOrWhiteSpace(PlayerName))
+            {
+                Player player = new Player(PlayerName, SelectedDivision);
+                LoadedPlayers.Add(player);
+                var save = JsonSerializer.Serialize(LoadedPlayers);
+                await File.WriteAllTextAsync(savePlayersPath, save);
             }
         }
 
@@ -82,7 +150,7 @@ namespace Tournament_manager.ViewModel
                 Tournament.RoundDurations = RoundDuration;
                 Tournament.Players = Players.ToList();
                 Tournament.Rounds.Add(RoundOne.MakeRoundOne(Tournament.Players));
-            TournamentStarted?.Invoke(Tournament);
+                TournamentStarted?.Invoke(Tournament);
             }
         }
 

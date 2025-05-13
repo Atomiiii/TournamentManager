@@ -12,5 +12,6 @@ namespace Tournament_manager.Model
         public int Player2Pts { get; set; }
 
         public bool Bye { get; set; } = false;
+        public int TableNumber { get; set; }
     }
 }

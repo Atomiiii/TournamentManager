@@ -10,7 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Compile Remove="Data\a\**" />
+    <EmbeddedResource Remove="Data\a\**" />
+    <None Remove="Data\a\**" />
+    <Page Remove="Data\a\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\SavedTournamentsData\" />
+    <Folder Include="Data\SavedPlayersData\" />
   </ItemGroup>
 
 </Project>

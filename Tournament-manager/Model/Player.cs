@@ -3,9 +3,9 @@ namespace Tournament_manager.Model
 {
     public enum PlayerDivision
     {
-        Junior,
+        Master,
         Senior,
-        Master
+        Junior,
     }
     public enum Result
     {
@@ -13,13 +13,40 @@ namespace Tournament_manager.Model
         Lose,
         Draw
     }
-    public class Player (string name, PlayerDivision division)
+    public class Player
     {
-        public string Name { get; set; } = name;
-        public PlayerDivision Division { get; set; } = division;
-        public List<Result> results { get; set; } = new List<Result>();
-        public int score { get; set; } = 0;
-        public List<Player> oponents { get; set; } = new List<Player>();
-        public bool hadBye { get; set; } = false;
+        public int id { get; set; }
+        public string Name { get; set; }
+        public PlayerDivision Division { get; set; }
+        public int Wins { get; set; } = 0;
+        public int Losses { get; set; } = 0;
+        public int Draws { get; set; } = 0;
+        public int Score { get; set; } = 0;
+        public int Points { get; set; } = 0;
+
+        // This is the circular reference list that causes the need for ReferenceHandler
+        public List<Player> Oponents { get; set; } = new();
+
+        public bool HadBye { get; set; } = false;
+        public List<string> Warnings { get; set; } = new();
+
+        public double WinRate
+        {
+            get
+            {
+                if (Wins + Losses + Draws == 0)
+                    return 0;
+                return (Wins + Draws / 2.0) / (Wins + Losses + Draws);
+            }
+        }
+
+        // Add this for convenience when manually creating players
+        public Player() { }
+
+        public Player(string name, PlayerDivision division)
+        {
+            Name = name;
+            Division = division;
+        }
     }
 }

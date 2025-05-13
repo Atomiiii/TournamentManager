@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
 using Tournament_manager.Model;
 using Tournament_manager.View;
@@ -24,7 +25,6 @@ namespace Tournament_manager.Pages
 
         private void OnTournamentStarted(Tournament tournament)
         {
-            // Navigate to the TournamentPage with the tournament passed in
             var tournamentPage = new TournamentPage(tournament);
             NavigationService.Navigate(tournamentPage);
         }
@@ -32,9 +32,15 @@ namespace Tournament_manager.Pages
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var clickedButton = e.OriginalSource as NavButton;
-            if (clickedButton?.NavUri != null)
+        }
+        private void LoadedPlayersGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DataGrid grid && grid.SelectedItem is Player selectedPlayer)
             {
-                // You can remove this old nav behavior if switching to event-based nav
+                if (DataContext is AddPlayersViewModel vm)
+                {
+                    vm.AddLoadedPlayerCommand.Execute(selectedPlayer);
+                }
             }
         }
     }

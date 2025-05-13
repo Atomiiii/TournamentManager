@@ -17,9 +17,6 @@ using Tournament_manager.ViewModel;
 
 namespace Tournament_manager.View
 {
-    /// <summary>
-    /// Interaction logic for TournamentPage.xaml
-    /// </summary>
     public partial class TournamentPage : Page
     {
         public TournamentPage(Tournament tournament)
