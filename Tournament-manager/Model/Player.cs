@@ -23,8 +23,8 @@ namespace Tournament_manager.Model
         public int Draws { get; set; } = 0;
         public int Score { get; set; } = 0;
         public int Points { get; set; } = 0;
+        public int Result { get; set; } = 0;
 
-        // This is the circular reference list that causes the need for ReferenceHandler
         public List<Player> Oponents { get; set; } = new();
 
         public bool HadBye { get; set; } = false;
@@ -40,7 +40,6 @@ namespace Tournament_manager.Model
             }
         }
 
-        // Add this for convenience when manually creating players
         public Player() { }
 
         public Player(string name, PlayerDivision division)

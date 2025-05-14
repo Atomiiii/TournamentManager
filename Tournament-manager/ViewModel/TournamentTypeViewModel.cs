@@ -52,8 +52,6 @@ namespace Tournament_manager.ViewModel
 
                     if (loadedTournament != null)
                     {
-                        // Now navigate to the page and pass the tournament
-                        
                         TournamentStarted?.Invoke(loadedTournament);
                     }
                     else

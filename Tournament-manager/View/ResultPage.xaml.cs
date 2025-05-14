@@ -17,20 +17,12 @@ using Tournament_manager.ViewModel;
 
 namespace Tournament_manager.View
 {
-    public partial class TournamentPage : Page
+    public partial class ResultPage : Page
     {
-        private TournamentViewModel viewModel;
-
-        public TournamentPage(Tournament tournament)
+        public ResultPage(Tournament tournament)
         {
             InitializeComponent();
-            viewModel = new TournamentViewModel(tournament);
-            viewModel.NavigateToResultPage += OnNavigateToResultPage; // <-- Subscribe to event here
-            DataContext = viewModel;
-        }
-        private void OnNavigateToResultPage(Tournament tournament)
-        {
-            NavigationService.Navigate(new ResultPage(tournament));
+            DataContext = new ResultPageViewModel(tournament);
         }
     }
 }

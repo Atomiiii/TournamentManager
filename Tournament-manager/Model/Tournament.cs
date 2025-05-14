@@ -11,6 +11,18 @@ namespace Tournament_manager.Model
         public int currentRoundIndex { get; set; } = 1;
         public int TableCount { get { 
                     return (int)Math.Floor((double)Players.Count / 2); } }
+        public int[] TableNumbers
+        {
+            get
+            {
+                int[] tableNumbers = new int[TableCount];
+                for (int i = 0; i < TableCount; i++)
+                {
+                    tableNumbers[i] = i + 1;
+                }
+                return tableNumbers;
+            }
+        }
         public int RoundCount { get { 
                 if (Players.Count == 0)
                 {

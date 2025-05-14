@@ -10,9 +10,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Tournament_manager.Helpers;
 using Tournament_manager.Model;
+using Tournament_manager.View;
+using System.Windows.Navigation;
 
 namespace Tournament_manager.ViewModel
 {
@@ -25,13 +28,14 @@ namespace Tournament_manager.ViewModel
         }
         public Tournament Tournament { get; }
         public string ShowTournamentName => $"Tournament: {Tournament.Name}";
-        public string ShowRoundNumber => $"Round {Tournament.currentRoundIndex}";
+        public string ShowRoundNumber => $"Round {Tournament.currentRoundIndex}/{Tournament.RoundCount}";
 
         public ICommand WinCommand { get; }
         public ICommand LoseCommand { get; }
         public ICommand DrawCommand { get; }
         public ICommand WarningCommand { get; }
         public ICommand DropCommand { get; }
+        public ICommand PrintPairingsCommand { get; }
 
         public ICommand ShowUnfinishedMatchesCommand { get; }
         public ICommand ShowFinishedMatchesCommand { get; }
@@ -67,6 +71,7 @@ namespace Tournament_manager.ViewModel
             DrawCommand = new RelayCommand(p => SetResult(p, Result.Draw));
             NextRoundCommand = new RelayCommand(_ => NextRoundAsync());
             SaveTournamentCommand = new RelayCommand(_ => SaveTournamentAsync());
+            PrintPairingsCommand = new RelayCommand(_ => PrintPairings());
 
 
             ShowUnfinishedMatchesCommand = new RelayCommand(_ => FilterMatches(MatchFilter.Unfinished));
@@ -74,6 +79,11 @@ namespace Tournament_manager.ViewModel
         }
 
         // methods
+        private async void PrintPairings()
+        {
+            ToPdf pdfGenerator = new ToPdf();
+            pdfGenerator.GeneratePairingsPdf(Tournament.Rounds[Tournament.currentRoundIndex - 1]);
+        }
         private async void SaveTournamentAsync()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -98,15 +108,13 @@ namespace Tournament_manager.ViewModel
         {
             if (!(Tournament.RoundCount == Tournament.Rounds.Count))
             {
-                if (allMatches.Any(m => m.Player1Result == null || m.Player2Result == null))
+                if (allMatches.Any(m => m.Player1Result == null))
                 {
-                    MessageBox.Show("You must complete all matches before proceeding to the next round.");
                     return;
                 }
                 foreach (Match match in allMatches)
                 {
-
-                    if (match.Player1.HadBye)
+                    if (match.Bye)
                     {
                         match.Player1.Wins++;
                         match.Player1.Score += 3;
@@ -134,17 +142,23 @@ namespace Tournament_manager.ViewModel
                 }
                 Tournament.currentRoundIndex++;
                 OnPropertyChanged(nameof(ShowRoundNumber));
-                Round currentRound = await Pairing.MakePairingAsynch(Tournament.Rounds.Count + 1, Tournament.Players);
+                Round currentRound = await Pairing.MakePairingAsynch(Tournament, Tournament.Rounds.Count + 1, Tournament.Players);
+                currentRound.Matches.Sort((x, y) => x.TableNumber.CompareTo(y.TableNumber));
                 Tournament.Rounds.Add(currentRound);
                 allMatches = new ObservableCollection<Match>(currentRound.Matches);
                 DisplayedMatches = new ObservableCollection<Match>(allMatches);
             } else
             {
-
+                await Pairing.SortPlayers(Tournament.Players);
+                for (int i = 0; i < Tournament.Players.Count; i++)
+                {
+                    Tournament.Players[i].Result = i + 1;
+                }
+                NavigateToResultPage?.Invoke(Tournament);
             }
- 
         }
-        // Method to filter matches based on their status
+        public event Action<Tournament> NavigateToResultPage;
+
         private void FilterMatches(MatchFilter filter)
         {
             currentFilter = filter;
@@ -171,41 +185,21 @@ namespace Tournament_manager.ViewModel
             if (match == null) return;
 
             bool isPlayer1 = parameter == match.Player1;
-            if (isPlayer1 && !match.Player1.HadBye)
+
+            Result result1;
+            Result result2;
+            if (isPlayer1)
             {
-                match.Player1Result = result;
-                if (result == Result.Win)
-                {
-                    match.Player2Result = Result.Lose;
-                }
-                else if (result == Result.Lose)
-                {
-                    match.Player2Result = Result.Win;
-                }
-                else if (result == Result.Draw)
-                {
-                    match.Player2Result = Result.Draw;
-                }
+                result1 = result;
+                result2 = result == Result.Win ? Result.Lose : (result == Result.Draw ? Result.Draw : Result.Lose);
             }
             else
             {
-                if (!(match.Player2 == null || match.Player2.HadBye))
-                {
-                    match.Player2Result = result;
-                    if (result == Result.Win)
-                    {
-                        match.Player1Result = Result.Lose;
-                    }
-                    else if (result == Result.Lose)
-                    {
-                        match.Player1Result = Result.Win;
-                    }
-                    else if (result == Result.Draw)
-                    {
-                        match.Player1Result = Result.Draw;
-                    }
-                }
+                result2 = result;
+                result1 = result == Result.Win ? Result.Lose : (result == Result.Draw ? Result.Draw : Result.Lose);
             }
+            match.Player1Result = result1;
+            match.Player2Result = result2;
 
             DisplayedMatches.Remove(match);
 

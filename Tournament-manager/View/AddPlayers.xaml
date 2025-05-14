@@ -109,7 +109,7 @@
                     <Label Content="Tournament name" HorizontalAlignment="Center"/>
                     <TextBox Margin="5,0,5,10" Text="{Binding TournamentName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <Label Content="Round time (minutes)" HorizontalAlignment="Center"/>
-                    <TextBox Margin="5,0,5,10" Text="{Binding RoundDuration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <TextBox Text="{Binding RoundDurationText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <Button Content="Save and Start Tournament"
                         Command="{Binding StartTournamentCommand}"
                         HorizontalAlignment="Center"

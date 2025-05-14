@@ -6,6 +6,7 @@ using Tournament_manager.Helpers;
 using Tournament_manager.Model;
 using System.Text.Json;
 using System.IO;
+using System.Windows;
 
 namespace Tournament_manager.ViewModel
 {
@@ -48,10 +49,15 @@ namespace Tournament_manager.ViewModel
             set { tournamentName = value; OnPropertyChanged(); }
         }
 
-        public int RoundDuration
+        private string roundDurationText;
+        public string RoundDurationText
         {
-            get => roundDuration;
-            set { roundDuration = value; OnPropertyChanged(); }
+            get => roundDurationText;
+            set
+            {
+                roundDurationText = value;
+                OnPropertyChanged();
+            }
         }
 
         public ICommand AddPlayerCommand { get; }
@@ -75,7 +81,7 @@ namespace Tournament_manager.ViewModel
 
 
             TournamentName = Tournament.Name;
-            RoundDuration = Tournament.RoundDurations;
+            RoundDurationText = Tournament.RoundDurations.ToString();
             List<Player> loadedPlayers = LoadPlayersAsync(savePlayersPath).Result;
             LoadedPlayers = new ObservableCollection<Player>(loadedPlayers);
 
@@ -142,15 +148,27 @@ namespace Tournament_manager.ViewModel
 
         public event Action<Tournament> TournamentStarted;
 
-        private void StartTournament()
+        private async Task StartTournament()
         {
             if (!string.IsNullOrWhiteSpace(TournamentName))
             {
-                Tournament.Name = TournamentName;
-                Tournament.RoundDurations = RoundDuration;
-                Tournament.Players = Players.ToList();
-                Tournament.Rounds.Add(RoundOne.MakeRoundOne(Tournament.Players));
-                TournamentStarted?.Invoke(Tournament);
+                if (Players.Count <= 4)
+                {
+                    MessageBox.Show("Minimum number of players for a swiss tournament is 5.");
+                    return;
+                }
+                else if (int.TryParse(RoundDurationText, out int roundDuration))
+                {
+                    Tournament.Name = TournamentName;
+                    Tournament.RoundDurations = roundDuration;
+                    Tournament.Players = Players.ToList();
+                    Round round = await RoundOne.MakeRoundOne(Tournament.Players);
+                    Tournament.Rounds.Add(round);
+                    TournamentStarted?.Invoke(Tournament);
+                } else
+                {
+                    MessageBox.Show("Please enter a valid number for round duration.");
+                }
             }
         }
 
