@@ -8,17 +8,26 @@ namespace Tournament_manager.Model
         {
             players.Sort((x, y) =>
             {
-                if (x.Points != y.Points)
-                    return y.Points.CompareTo(x.Points);
+                
                 if (x.Score != y.Score)
+                {
                     return y.Score.CompareTo(x.Score);
-                if ( x.Oponents.Count != 0 && y.Oponents.Count != 0)
+                }
+                else if (x.Points != y.Points)
+                {
+                    return y.Points.CompareTo(x.Points);
+                }
+                else if ( x.Oponents.Count != 0 && y.Oponents.Count != 0)
                 {
                     double xOponentWinrate = x.Oponents.Average(o => o.WinRate);
                     double yOponentWinrate = y.Oponents.Average(o => o.WinRate);
                     return xOponentWinrate.CompareTo(yOponentWinrate);
                 }
-                return x.WinRate.CompareTo(y.WinRate);
+                else
+                {
+                    return x.WinRate.CompareTo(y.WinRate);
+                }
+                
             });
         }
 

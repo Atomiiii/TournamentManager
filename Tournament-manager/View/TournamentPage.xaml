@@ -92,7 +92,7 @@
                                         <StackPanel>
                                             <TextBlock Text="{Binding Player1.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
                                             <TextBlock>
-                                                <Run Text="{Binding Player1.Wins}"/>
+                                                <Run Text="{Binding Player1.Score}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player1.Draws}"/>
                                                 <Run Text=" - "/>
@@ -139,7 +139,7 @@
                                         <StackPanel>
                                             <TextBlock Text="{Binding Player2.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
                                             <TextBlock>
-                                                <Run Text="{Binding Player2.Wins}"/>
+                                                <Run Text="{Binding Player2.Score}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player2.Draws}"/>
                                                 <Run Text=" - "/>

@@ -106,8 +106,7 @@ namespace Tournament_manager.ViewModel
         }
         private async void NextRoundAsync()
         {
-            if (!(Tournament.RoundCount == Tournament.Rounds.Count))
-            {
+            
                 if (allMatches.Any(m => m.Player1Result == null))
                 {
                     return;
@@ -140,6 +139,8 @@ namespace Tournament_manager.ViewModel
                         match.Player2.Points += match.Player2Pts;
                     }
                 }
+            if (!(Tournament.RoundCount == Tournament.Rounds.Count))
+            {
                 Tournament.currentRoundIndex++;
                 OnPropertyChanged(nameof(ShowRoundNumber));
                 Round currentRound = await Pairing.MakePairingAsynch(Tournament, Tournament.Rounds.Count + 1, Tournament.Players);

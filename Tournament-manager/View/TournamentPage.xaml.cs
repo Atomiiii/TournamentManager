@@ -25,7 +25,7 @@ namespace Tournament_manager.View
         {
             InitializeComponent();
             viewModel = new TournamentViewModel(tournament);
-            viewModel.NavigateToResultPage += OnNavigateToResultPage; // <-- Subscribe to event here
+            viewModel.NavigateToResultPage += OnNavigateToResultPage;
             DataContext = viewModel;
         }
         private void OnNavigateToResultPage(Tournament tournament)
