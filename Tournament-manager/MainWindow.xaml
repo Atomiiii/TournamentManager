@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
 
     <Grid >
-        <Frame Source="/Pages/TournamentType.xaml" NavigationUIVisibility="Hidden"/>
+        <Frame Source="/View/TournamentType.xaml" NavigationUIVisibility="Hidden"/>
     </Grid>
 
 
