@@ -14,6 +14,7 @@ namespace Tournament_manager.ViewModel
 {
     public class TournamentViewModel : INotifyPropertyChanged
     {
+        // parameters
         public enum MatchFilter
         {
             Unfinished,
@@ -133,11 +134,12 @@ namespace Tournament_manager.ViewModel
         }
         private async void NextRoundAsync()
         {
-            
+                // Round not finished
                 if (allMatches.Any(m => m.Player1Result == null))
                 {
                     return;
                 }
+                // Round finished
                 foreach (Match match in allMatches)
                 {
                     if (match.Bye)
@@ -166,6 +168,7 @@ namespace Tournament_manager.ViewModel
                         match.Player2.Points += match.Player2Pts;
                     }
                 }
+            // Tournament not finished
             if (!(Tournament.RoundCount == Tournament.Rounds.Count))
             {
                 Tournament.currentRoundIndex++;
@@ -181,7 +184,9 @@ namespace Tournament_manager.ViewModel
                 OnPropertyChanged(nameof(TimerMinutes));
                 OnPropertyChanged(nameof(TimerSeconds));
 
-            } else
+            } 
+            // Tournament finished
+            else
             {
                 await Pairing.SortPlayers(Tournament.Players);
                 for (int i = 0; i < Tournament.Players.Count; i++)

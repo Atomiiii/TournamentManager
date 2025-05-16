@@ -3,6 +3,7 @@ namespace Tournament_manager.Model
 {
     public class RoundOne
     {
+        // Round 1 pairing
         public static async Task<Round> MakeRoundOne(List<Player> players)
         {
             Round round = new Round
@@ -11,8 +12,10 @@ namespace Tournament_manager.Model
             };
 
             Random random = new Random();
+            // Ordering players randomly
             players = players.OrderBy(x => random.Next()).ToList();
 
+            // Issueing bye if odd player number
             int byeShift = 0;
             if (players.Count % 2 != 0)
             {
@@ -30,6 +33,7 @@ namespace Tournament_manager.Model
 
                 byeShift = 1;
             }
+
             int table = 1;
             for (int i = 0; i < (players.Count - byeShift)/2; i++)
             {

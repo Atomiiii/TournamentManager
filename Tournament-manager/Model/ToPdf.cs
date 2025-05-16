@@ -15,12 +15,14 @@ namespace Tournament_manager.Model
     {
         public async void GeneratePairingsPdf(Round round)
         {
-            string tempFile = Path.Combine(Path.GetTempPath(), $"TournamentResults_{Guid.NewGuid()}.pdf");
+            // Generate to a temp file => doesn't fill the memory
+            string tempFile = Path.Combine(Path.GetTempPath(), $"TournamentPairing_{Guid.NewGuid()}.pdf");
             using (var writer = new PdfWriter(tempFile))
             {
                 using (var pdf = new PdfDocument(writer))
                 {
                     var document = new Document(pdf);
+                    // Set font which supports special characters (č, š, ř,...)
                     string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
                     PdfFont font = CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
                     document.SetFont(font);
@@ -29,6 +31,7 @@ namespace Tournament_manager.Model
                     document.Add(new Paragraph($"Round {round.RoundNumber}").SetTextAlignment(TextAlignment.CENTER).SetFontSize(16));
 
                     var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 3 })).UseAllAvailableWidth();
+                    // Header
                     table.AddHeaderCell(new Cell().Add(new Paragraph("Table"))
                         .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                         .SetTextAlignment(TextAlignment.CENTER)
@@ -42,6 +45,7 @@ namespace Tournament_manager.Model
                         .SetTextAlignment(TextAlignment.CENTER)
                         .SetPadding(5));
 
+                    // filling table
                     foreach (var pairing in round.Matches)
                     {
                         table.AddCell($"Table {pairing.TableNumber}");
@@ -65,12 +69,14 @@ namespace Tournament_manager.Model
 
         public async void GenerateResultsPdf(Tournament tournament)
         {
+            // Generate to a temp file => doesn't fill the memory
             string tempFile = Path.Combine(Path.GetTempPath(), $"TournamentResults_{Guid.NewGuid()}.pdf");
             using (var writer = new PdfWriter(tempFile))
             {
                 using (var pdf = new PdfDocument(writer))
                 {
                     var document = new Document(pdf);
+                    // Set font which supports special characters (č, š, ř,...)
                     string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
                     PdfFont font = CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
 
@@ -90,7 +96,7 @@ namespace Tournament_manager.Model
                     var table = new Table(new float[] { 1, 4, 3, 1 })
                         .UseAllAvailableWidth()
                         .SetHorizontalAlignment(HorizontalAlignment.CENTER);
-
+                    // header
                     table.AddHeaderCell(new Cell().Add(new Paragraph("#"))
                         .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                         .SetTextAlignment(TextAlignment.CENTER)
@@ -108,6 +114,7 @@ namespace Tournament_manager.Model
                         .SetTextAlignment(TextAlignment.CENTER)
                         .SetPadding(5));
 
+                    // filling table
                     int i = 1;
                     foreach (var player in tournament.Players)
                     {

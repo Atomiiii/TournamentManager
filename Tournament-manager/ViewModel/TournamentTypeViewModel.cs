@@ -7,9 +7,6 @@ using Tournament_manager.Helpers;
 using Tournament_manager.Model;
 
 
-
-
-
 namespace Tournament_manager.ViewModel
 {
     internal class TournamentTypeViewModel

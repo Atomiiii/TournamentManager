@@ -5,6 +5,7 @@ namespace Tournament_manager.Model
 {
     public class Pairing
     {
+        // sorting players by wins-draws-losses, points, oponents winrate
         public static async Task SortPlayers(List<Player> players)
         {
             players.Sort((x, y) =>
@@ -18,86 +19,61 @@ namespace Tournament_manager.Model
                 {
                     return y.Points.CompareTo(x.Points);
                 }
-                else if ( x.Oponents.Count != 0 && y.Oponents.Count != 0)
+                else
                 {
                     double xOponentWinrate = x.Oponents.Average(o => o.WinRate);
                     double yOponentWinrate = y.Oponents.Average(o => o.WinRate);
                     return xOponentWinrate.CompareTo(yOponentWinrate);
                 }
-                else
-                {
-                    return x.WinRate.CompareTo(y.WinRate);
-                }
             });
         }
 
-        public static bool FindOponent(Round round, Player wantsOponent, List<Player> players, int index, HashSet<Player> inGame, Player currentBye)
-        {
-            while (index < players.Count)
-            {
-                if (inGame.Contains(players[index]) || currentBye == players[index] || wantsOponent.Oponents.Contains(players[index]))
-                {
-                    index++;
-                    continue;
-                }
-                Match match = new Match
-                {
-                    Player1 = wantsOponent,
-                    Player2 = players[index],
-                };
-                inGame.Add(wantsOponent);
-                inGame.Add(players[index]);
-                match.Player1.Oponents.Add(match.Player2);
-                match.Player2.Oponents.Add(match.Player1);
-                round.Matches.Add(match);
-                return true;
-            }
-
-            return false;
-        }
         public static bool MakePairingRec(Round round, List<Player> players, int index, HashSet<Player> inGame, Player? bye)
         {
+            // finished pairing
             if (index >= players.Count)
             {
                 return true;
             }
 
-            Player p1 = players[index];
-            if (inGame.Contains(p1) || p1 == bye)
+            Player candidate = players[index];
+            // candidate in game or has bye
+            if (inGame.Contains(candidate) || candidate == bye)
             {
                 return MakePairingRec(round, players, index + 1, inGame, bye);
             }
 
+            // find oponent
             for (int i = index + 1; i < players.Count; i++)
             {
-                Player p2 = players[i];
-                if (inGame.Contains(p2) || p2 == bye || p1.Oponents.Contains(p2))
+                Player oponent = players[i];
+                if (inGame.Contains(oponent) || oponent == bye || candidate.Oponents.Contains(oponent))
                 {
                     continue;
                 }
 
                 Match match = new Match
                 {
-                    Player1 = p1,
-                    Player2 = p2
+                    Player1 = candidate,
+                    Player2 = oponent
                 };
 
                 round.Matches.Add(match);
-                inGame.Add(p1);
-                inGame.Add(p2);
-                p1.Oponents.Add(p2);
-                p2.Oponents.Add(p1);
+                inGame.Add(candidate);
+                inGame.Add(oponent);
+                candidate.Oponents.Add(oponent);
+                oponent.Oponents.Add(candidate);
 
                 if (MakePairingRec(round, players, index + 1, inGame, bye))
                 {
                     return true;
                 }
-                    
+                // if pairing failed, try next oponent 
                 round.Matches.RemoveAt(round.Matches.Count - 1);
-                inGame.Remove(p1);
-                inGame.Remove(p2);
-                p1.Oponents.Remove(p2);
-                p2.Oponents.Remove(p1);
+                inGame.Remove(candidate);
+                inGame.Remove(oponent);
+                candidate.Oponents.Remove(oponent);
+                oponent.Oponents.Remove(candidate);
             }
             return false;
         }
@@ -123,6 +99,7 @@ namespace Tournament_manager.Model
                 round.Matches.Add(byeMatch);
                 byePlayer = players[byeIndex];
             }
+            // Randomize tables => better for Warhammer Tournaments
             int[] tables = new int[tournament.TableCount];
             for (int i = 0; i < tables.Length; i++)
             {
@@ -130,7 +107,12 @@ namespace Tournament_manager.Model
             }
             int tableIndex = 0;
             System.Random.Shared.Shuffle(tables);
+
             bool success = MakePairingRec(round, players, 0, new HashSet<Player>(), byePlayer);
+            // pairing failed (shouldn't happen)
+            if (!success)
+                throw new Exception("Could not create a valid Swiss pairing.");
+            // assign tables
             foreach (Match match in round.Matches)
             {
                 if (match.Bye)
@@ -140,12 +122,12 @@ namespace Tournament_manager.Model
                 match.TableNumber = tables[tableIndex];
                 tableIndex++;
             }
-            if (!success)
-                throw new Exception("Could not create a valid Swiss pairing.");
+            
 
             return round;
         }
 
+        // Issue bye => give bye to older players first so younger can play
         public static void IssueBye(List<Player> players, ref int byeIndex, bool takeYounglins)
         {
             while (players[byeIndex].HadBye || (!takeYounglins && (players[byeIndex].Division == PlayerDivision.Senior || players[byeIndex].Division == PlayerDivision.Junior)))

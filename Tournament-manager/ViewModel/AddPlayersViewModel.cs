@@ -94,6 +94,8 @@ namespace Tournament_manager.ViewModel
         }
 
         // methods
+
+        //deleting players
         private void DeletePlayer(Player player)
         {
             if (player != null && Players.Contains(player))
@@ -110,6 +112,8 @@ namespace Tournament_manager.ViewModel
                 await File.WriteAllTextAsync(savePlayersPath, json);
             }
         }
+
+        // adding players
         private void AddLoadedPlayer(Player player)
         {
             if (player != null && !Players.Contains(player))
@@ -118,6 +122,16 @@ namespace Tournament_manager.ViewModel
             }
         }
 
+        private void AddPlayer()
+        {
+            if (!string.IsNullOrWhiteSpace(PlayerName))
+            {
+                Players.Add(new Player(PlayerName, SelectedDivision));
+                PlayerName = string.Empty;
+            }
+        }
+
+        // loading and saving players
         public static async Task<List<Player>> LoadPlayersAsync(string filePath)
         {
             if (!File.Exists(filePath))
@@ -126,14 +140,6 @@ namespace Tournament_manager.ViewModel
             }
             string loadedData = File.ReadAllText(filePath);
             return JsonSerializer.Deserialize<List<Player>>(loadedData) ?? new List<Player>();
-        }
-        private void AddPlayer()
-        {
-            if (!string.IsNullOrWhiteSpace(PlayerName))
-            {
-                Players.Add(new Player(PlayerName, SelectedDivision));
-                PlayerName = string.Empty;
-            }
         }
         private async void SavePlayer()
         {
@@ -146,6 +152,7 @@ namespace Tournament_manager.ViewModel
             }
         }
 
+        // starting tournament
         public event Action<Tournament> TournamentStarted;
 
         private async Task StartTournament()
