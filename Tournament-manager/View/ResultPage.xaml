@@ -8,13 +8,13 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ResultPage">
 
-    <Grid Background="White">
+    <Grid Background="MistyRose">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <ListView Grid.Row="0" ItemsSource="{Binding Tournament.Players}" HorizontalAlignment="Center">
+        <ListView Grid.Row="0" ItemsSource="{Binding Tournament.Players}" HorizontalAlignment="Center" Background="LightPink">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>

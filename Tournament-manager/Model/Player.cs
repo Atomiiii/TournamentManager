@@ -29,6 +29,7 @@ namespace Tournament_manager.Model
 
         public bool HadBye { get; set; } = false;
         public List<string> Warnings { get; set; } = new();
+        public int WarningCount { get; set; } = 0;
 
         public double WinRate
         {

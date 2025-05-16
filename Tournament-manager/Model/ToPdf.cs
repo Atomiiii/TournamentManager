@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using System.IO;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using System.Diagnostics;
 using iText.Kernel.Colors;
+using iText.IO.Font;
+using iText.Kernel.Font;
+using static iText.Kernel.Font.PdfFontFactory;
 
 namespace Tournament_manager.Model
 {
@@ -23,23 +21,38 @@ namespace Tournament_manager.Model
                 using (var pdf = new PdfDocument(writer))
                 {
                     var document = new Document(pdf);
+                    string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
+                    PdfFont font = CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
+                    document.SetFont(font);
                     document.Add(new Paragraph("Tournament Pairings").SetTextAlignment(TextAlignment.CENTER).SetFontSize(20));
 
                     document.Add(new Paragraph($"Round {round.RoundNumber}").SetTextAlignment(TextAlignment.CENTER).SetFontSize(16));
 
-                    var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 3 })).UseAllAvailableWidth(); // Two columns: Player 1 and Player 2
+                    var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 3 })).UseAllAvailableWidth();
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Table"))
+                        .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetPadding(5));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Player1"))
+                        .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetPadding(5));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Player2"))
+                        .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetPadding(5));
 
                     foreach (var pairing in round.Matches)
                     {
                         table.AddCell($"Table {pairing.TableNumber}");
-                        table.AddCell(pairing.Player1.Name);
+                        table.AddCell($"{pairing.Player1.Name} \n {pairing.Player1.Wins}-{pairing.Player1.Draws}-{pairing.Player1.Losses} \n VP: {pairing.Player1.Points}");
                         if (pairing.Player2 == null)
                         {
                             table.AddCell("");
                         }
                         else
                         {
-                            table.AddCell(pairing.Player2.Name);
+                            table.AddCell($"{pairing.Player2.Name} \n {pairing.Player2.Wins}-{pairing.Player2.Draws}-{pairing.Player2.Losses} \n VP: {pairing.Player2.Points}");
                         }
                     }
 
@@ -58,6 +71,8 @@ namespace Tournament_manager.Model
                 using (var pdf = new PdfDocument(writer))
                 {
                     var document = new Document(pdf);
+                    string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
+                    PdfFont font = CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
 
                     document.Add(new Paragraph("Tournament Results")
                         .SetTextAlignment(TextAlignment.CENTER)
@@ -72,7 +87,7 @@ namespace Tournament_manager.Model
                         .SetFontSize(16)
                         .SetMarginBottom(10));
 
-                    var table = new Table(new float[] { 1, 4, 3 })
+                    var table = new Table(new float[] { 1, 4, 3, 1 })
                         .UseAllAvailableWidth()
                         .SetHorizontalAlignment(HorizontalAlignment.CENTER);
 
@@ -88,6 +103,10 @@ namespace Tournament_manager.Model
                         .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                         .SetTextAlignment(TextAlignment.CENTER)
                         .SetPadding(5));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Victory Points"))
+                        .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetPadding(5));
 
                     int i = 1;
                     foreach (var player in tournament.Players)
@@ -98,6 +117,9 @@ namespace Tournament_manager.Model
                         table.AddCell(new Cell().Add(new Paragraph(player.Name))
                             .SetPadding(5));
                         table.AddCell(new Cell().Add(new Paragraph($"{player.Wins}-{player.Draws}-{player.Losses}"))
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetPadding(5));
+                        table.AddCell(new Cell().Add(new Paragraph(player.Points.ToString()))
                             .SetTextAlignment(TextAlignment.CENTER)
                             .SetPadding(5));
                         i++;

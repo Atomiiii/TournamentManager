@@ -1,21 +1,14 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Tournament_manager.Helpers;
 using Tournament_manager.Model;
-using Tournament_manager.View;
-using System.Windows.Navigation;
 
 namespace Tournament_manager.ViewModel
 {
@@ -29,12 +22,18 @@ namespace Tournament_manager.ViewModel
         public Tournament Tournament { get; }
         public string ShowTournamentName => $"Tournament: {Tournament.Name}";
         public string ShowRoundNumber => $"Round {Tournament.currentRoundIndex}/{Tournament.RoundCount}";
+        public int TimerHours => Tournament.RoundTime / 3600;
+        public int TimerMinutes => (Tournament.RoundTime % 3600) / 60;
+        public int TimerSeconds => Tournament.RoundTime % 60;
+        public bool TimerIsActive = false;
 
         public ICommand WinCommand { get; }
         public ICommand LoseCommand { get; }
         public ICommand DrawCommand { get; }
         public ICommand WarningCommand { get; }
         public ICommand DropCommand { get; }
+        public ICommand StartTimerCommand { get; }
+        public ICommand ResetTimerCommand { get; }
         public ICommand PrintPairingsCommand { get; }
 
         public ICommand ShowUnfinishedMatchesCommand { get; }
@@ -69,6 +68,10 @@ namespace Tournament_manager.ViewModel
             WinCommand = new RelayCommand(p => SetResult(p, Result.Win));
             LoseCommand = new RelayCommand(p => SetResult(p, Result.Lose));
             DrawCommand = new RelayCommand(p => SetResult(p, Result.Draw));
+            WarningCommand = new RelayCommand(p => IssueWarning(p));
+            DropCommand = new RelayCommand(p => DropPlayer(p));
+            StartTimerCommand = new RelayCommand(_ => Timer());
+            ResetTimerCommand = new RelayCommand(_ => ResetTimer());
             NextRoundCommand = new RelayCommand(_ => NextRoundAsync());
             SaveTournamentCommand = new RelayCommand(_ => SaveTournamentAsync());
             PrintPairingsCommand = new RelayCommand(_ => PrintPairings());
@@ -79,6 +82,30 @@ namespace Tournament_manager.ViewModel
         }
 
         // methods
+        private void IssueWarning(object? parameter)
+        {
+            if (parameter is not Player targetPlayer)
+                return;
+            var match = DisplayedMatches.FirstOrDefault(m => m.Player1 == targetPlayer || m.Player2 == targetPlayer);
+            if (match == null) return;
+            bool isPlayer1 = parameter == match.Player1;
+            if (isPlayer1)
+            {
+                match.Player1.WarningCount++;
+            }
+            else
+            {
+                match.Player2.WarningCount++;
+            }
+            MessageBox.Show($"Warning issued to {targetPlayer.Name}. Total warnings: {targetPlayer.WarningCount}");
+        }
+        private void DropPlayer(object? parameter)
+        {
+            if (parameter is not Player targetPlayer)
+                return;
+            var match = DisplayedMatches.FirstOrDefault(m => m.Player1 == targetPlayer || m.Player2 == targetPlayer);
+            Tournament.Players.Remove(targetPlayer);
+        }
         private async void PrintPairings()
         {
             ToPdf pdfGenerator = new ToPdf();
@@ -143,11 +170,17 @@ namespace Tournament_manager.ViewModel
             {
                 Tournament.currentRoundIndex++;
                 OnPropertyChanged(nameof(ShowRoundNumber));
+                TimerIsActive = false;
                 Round currentRound = await Pairing.MakePairingAsynch(Tournament, Tournament.Rounds.Count + 1, Tournament.Players);
                 currentRound.Matches.Sort((x, y) => x.TableNumber.CompareTo(y.TableNumber));
                 Tournament.Rounds.Add(currentRound);
                 allMatches = new ObservableCollection<Match>(currentRound.Matches);
                 DisplayedMatches = new ObservableCollection<Match>(allMatches);
+                Tournament.RoundTime = Tournament.RoundDurations * 60;
+                OnPropertyChanged(nameof(TimerHours));
+                OnPropertyChanged(nameof(TimerMinutes));
+                OnPropertyChanged(nameof(TimerSeconds));
+
             } else
             {
                 await Pairing.SortPlayers(Tournament.Players);
@@ -205,6 +238,39 @@ namespace Tournament_manager.ViewModel
             DisplayedMatches.Remove(match);
 
             FilterMatches(currentFilter);
+        }
+
+        public async Task Timer()
+        {
+            if (TimerIsActive)
+            {
+                TimerIsActive = false;
+                return;
+            }
+            TimerIsActive = true;
+            while (Tournament.RoundTime >= 0 && TimerIsActive)
+            {
+                Tournament.RoundTime--;
+                await TimerTick();
+                OnPropertyChanged(nameof(TimerHours));
+                OnPropertyChanged(nameof(TimerMinutes));
+                OnPropertyChanged(nameof(TimerSeconds));
+            }
+        }
+
+        public async Task TimerTick()
+        {
+            await Task.Delay(1000);
+        }
+
+        public async Task ResetTimer()
+        {
+            TimerIsActive = false;
+            Tournament.RoundTime = Tournament.RoundDurations * 60;
+            OnPropertyChanged(nameof(TimerHours));
+            OnPropertyChanged(nameof(TimerMinutes));
+            OnPropertyChanged(nameof(TimerSeconds));
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

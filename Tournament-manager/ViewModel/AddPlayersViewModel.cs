@@ -161,7 +161,9 @@ namespace Tournament_manager.ViewModel
                 {
                     Tournament.Name = TournamentName;
                     Tournament.RoundDurations = roundDuration;
+                    Tournament.RoundTime = roundDuration * 60;
                     Tournament.Players = Players.ToList();
+                    Tournament.RoundCount = (int)Math.Ceiling(Math.Log2((double)Players.Count));
                     Round round = await RoundOne.MakeRoundOne(Tournament.Players);
                     Tournament.Rounds.Add(round);
                     TournamentStarted?.Invoke(Tournament);

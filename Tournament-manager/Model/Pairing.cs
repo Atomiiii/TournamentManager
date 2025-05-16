@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System.Collections.Generic;
 
 namespace Tournament_manager.Model
 {
@@ -27,7 +28,6 @@ namespace Tournament_manager.Model
                 {
                     return x.WinRate.CompareTo(y.WinRate);
                 }
-                
             });
         }
 
@@ -99,7 +99,6 @@ namespace Tournament_manager.Model
                 p1.Oponents.Remove(p2);
                 p2.Oponents.Remove(p1);
             }
-
             return false;
         }
         public static async Task<Round> MakePairingAsynch(Tournament tournament, int roundNumber, List<Player> players)
@@ -112,11 +111,7 @@ namespace Tournament_manager.Model
             int byeIndex = players.Count - 1;
             if (players.Count % 2 != 0)
             {
-                while (players[byeIndex].HadBye)
-                {
-                    byeIndex--;
-                }
-                players[byeIndex].HadBye = true;
+                IssueBye(players, ref byeIndex, false);
                 Match byeMatch = new Match
                 {
                     TableNumber = 0,
@@ -150,5 +145,20 @@ namespace Tournament_manager.Model
 
             return round;
         }
+
+        public static void IssueBye(List<Player> players, ref int byeIndex, bool takeYounglins)
+        {
+            while (players[byeIndex].HadBye || (!takeYounglins && (players[byeIndex].Division == PlayerDivision.Senior || players[byeIndex].Division == PlayerDivision.Junior)))
+            {
+                byeIndex--;
+            }
+            if (byeIndex < 0)
+            {
+                IssueBye(players, ref byeIndex, true);
+                return;
+            }
+            players[byeIndex].HadBye = true;
+        }
+
     }
 }

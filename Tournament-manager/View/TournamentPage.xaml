@@ -10,23 +10,30 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="TournamentPage">
 
-    <Grid Background="White">
+    <Grid Background="MistyRose">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".2*"/>
             <ColumnDefinition Width=".8*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Timer and Save Tournament-->
-        <Grid Grid.Column="0" Background="LightGray">
+        <Grid Grid.Column="0" Background="LightPink">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="70"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="00:00:00"
-                    FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Button Content="Start timer" Margin="15"></Button>
+                <TextBlock
+                    FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"> 
+                    <Run Text="{Binding TimerHours, Mode=OneWay}"/>
+                    <Run Text=":"/>
+                    <Run Text="{Binding TimerMinutes, Mode=OneWay}"/>
+                    <Run Text=":"/>
+                    <Run Text="{Binding TimerSeconds, Mode=OneWay}"/>
+                </TextBlock>
+                <Button Content="Start/Stop timer" Width="100" Margin="5,15,5,5" Command="{Binding StartTimerCommand}"></Button>
+                <Button Content="Reset timer" Width="100" Command="{Binding ResetTimerCommand}"></Button>
             </StackPanel>
 
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -50,123 +57,147 @@
             <!-- Filter Buttons -->
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,15">
                 <Button Content="Unfinished" Width="100" Margin="5,0" Padding="5,3"
-            Command="{Binding ShowUnfinishedMatchesCommand}"/>
+                    Command="{Binding ShowUnfinishedMatchesCommand}"/>
                 <Button Content="Finished" Width="100" Margin="5,0" Padding="5,3"
-            Command="{Binding ShowFinishedMatchesCommand}"/>
+                    Command="{Binding ShowFinishedMatchesCommand}"/>
             </StackPanel>
 
             <Grid Grid.Row="2">
                 <!-- Pairing -->
-                <ListView Grid.Column="1" ItemsSource="{Binding DisplayedMatches}" HorizontalAlignment="Center">
+                <ListView Grid.Column="1" ItemsSource="{Binding DisplayedMatches}" HorizontalAlignment="Center" Background="LightPink">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0,10">
-                                <!-- Table Number -->
-                                <TextBlock Text="{Binding TableNumber, StringFormat='Table {0}'}"
+                            <Border CornerRadius="6" BorderBrush="Gray" Background="MistyRose" BorderThickness="2" DockPanel.Dock="Top">
+                                <StackPanel Margin="0,10" >
+                                    <!-- Table Number -->
+                                    <TextBlock Text="{Binding TableNumber, StringFormat='Table {0}'}"
                                    FontSize="13"
                                    FontWeight="Bold"
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,5"/>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <!-- Player 1 -->
-                                    <Border Grid.Column="0" Padding="5" Margin="5">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Player1Result}" Value="Win">
-                                                        <Setter Property="Background" Value="LightGreen"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Player1Result}" Value="Lose">
-                                                        <Setter Property="Background" Value="LightCoral"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Player1.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
-                                            <TextBlock>
-                                                <Run Text="{Binding Player1.Score}"/>
+                                        <!-- Player 1 -->
+                                        <Border Grid.Column="0" Padding="5" Margin="5" BorderThickness="1" BorderBrush="Gray">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Player1Result}" Value="Win">
+                                                            <Setter Property="Background" Value="LightGreen"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Player1Result}" Value="Lose">
+                                                            <Setter Property="Background" Value="LightCoral"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Player1Result}" Value="Draw">
+                                                            <Setter Property="Background" Value="LightYellow"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Player1.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                <TextBlock>
+                                                <Run Text="{Binding Player1.Wins}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player1.Draws}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player1.Losses}"/>
                                                 <Run Text=" Current VP: "/>
                                                 <Run Text="{Binding Player1.Points}"/>
-                                            </TextBlock>
-                                            <TextBlock Text="Points:" FontWeight="SemiBold" Margin="0,5,0,0"/>
-                                            <wpfx:IntegerUpDown Minimum="0" Value="{Binding Player1Pts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="70" Margin="0,2,0,5" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Content="Win" Margin="2"
+                                                </TextBlock>
+                                                <TextBlock Text="Points:" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                                <wpfx:IntegerUpDown Minimum="0" Value="{Binding Player1Pts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="70" Margin="0,2,0,5" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="Win" Margin="2"
                                                     Command="{Binding DataContext.WinCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player1}"
                                                     Background="Green"/>
-                                                <Button Content="Lose" Margin="2"
+                                                    <Button Content="Lose" Margin="2"
                                                     Command="{Binding DataContext.LoseCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player1}"
                                                     Background="Red"/>
-                                                <Button Content="Draw" Margin="2"
+                                                    <Button Content="Draw" Margin="2"
                                                     Command="{Binding DataContext.DrawCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player1}"
                                                     Background="Yellow"/>
+                                                    <Button Content="Warn" Margin="2"
+                                                    Command="{Binding DataContext.WarningCommand, ElementName=TournamentPageRoot}" 
+                                                    CommandParameter="{Binding Player1}"
+                                                    Background="RosyBrown"/>
+                                                    <Button Content="Drop" Margin="2"
+                                                    Command="{Binding DataContext.DropCommand, ElementName=TournamentPageRoot}" 
+                                                    CommandParameter="{Binding Player1}"
+                                                    Background="OrangeRed"/>
+                                                </StackPanel>
                                             </StackPanel>
-                                        </StackPanel>
-                                    </Border>
+                                        </Border>
 
-                                    <!-- VS -->
-                                    <TextBlock Grid.Column="1" Text="VS" VerticalAlignment="Center" FontWeight="Bold" Margin="10,0"/>
+                                        <!-- VS -->
+                                        <TextBlock Grid.Column="1" Text="VS" VerticalAlignment="Center" FontWeight="Bold" Margin="10,0"/>
 
-                                    <!-- Player 2 -->
-                                    <Border Grid.Column="2" Padding="5" Margin="5">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Player1Result}" Value="Lose">
-                                                        <Setter Property="Background" Value="LightGreen"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Player1Result}" Value="Win">
-                                                        <Setter Property="Background" Value="LightCoral"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Player2.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
-                                            <TextBlock>
-                                                <Run Text="{Binding Player2.Score}"/>
+                                        <!-- Player 2 -->
+                                        <Border Grid.Column="2" Padding="5" Margin="5" BorderThickness="1" BorderBrush="Gray">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Player1Result}" Value="Lose">
+                                                            <Setter Property="Background" Value="LightGreen"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Player1Result}" Value="Win">
+                                                            <Setter Property="Background" Value="LightCoral"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Player2Result}" Value="Draw">
+                                                            <Setter Property="Background" Value="LightYellow"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Player2.Name}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                <TextBlock>
+                                                <Run Text="{Binding Player2.Wins}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player2.Draws}"/>
                                                 <Run Text=" - "/>
                                                 <Run Text="{Binding Player2.Losses}"/>
                                                 <Run Text=" Current VP: "/>
                                                 <Run Text="{Binding Player2.Points}"/>
-                                            </TextBlock>
-                                            <TextBlock Text="Points:" FontWeight="SemiBold" Margin="0,5,0,0"/>
-                                            <wpfx:IntegerUpDown Minimum="0" Value="{Binding Player2Pts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="70" Margin="0,2,0,5" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Content="Win" Margin="2"
+                                                </TextBlock>
+                                                <TextBlock Text="Points:" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                                <wpfx:IntegerUpDown Minimum="0" Value="{Binding Player2Pts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="70" Margin="0,2,0,5" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="Win" Margin="2"
                                                     Command="{Binding DataContext.WinCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player2}"
                                                     Background="Green"/>
-                                                <Button Content="Lose" Margin="2"
+                                                    <Button Content="Lose" Margin="2"
                                                     Command="{Binding DataContext.LoseCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player2}"
                                                     Background="Red"/>
-                                                <Button Content="Draw" Margin="2"
+                                                    <Button Content="Draw" Margin="2"
                                                     Command="{Binding DataContext.DrawCommand, ElementName=TournamentPageRoot}" 
                                                     CommandParameter="{Binding Player2}"
                                                     Background="Yellow"/>
+                                                    <Button Content="Warn" Margin="2"
+                                                    Command="{Binding DataContext.WarningCommand, ElementName=TournamentPageRoot}" 
+                                                    CommandParameter="{Binding Player2}"
+                                                    Background="RosyBrown"/>
+                                                    <Button Content="Drop" Margin="2"
+                                                    Command="{Binding DataContext.DropCommand, ElementName=TournamentPageRoot}" 
+                                                    CommandParameter="{Binding Player2}"
+                                                    Background="OrangeRed"/>
+                                                </StackPanel>
                                             </StackPanel>
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
