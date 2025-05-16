@@ -174,7 +174,19 @@ namespace Tournament_manager.ViewModel
                 Tournament.currentRoundIndex++;
                 OnPropertyChanged(nameof(ShowRoundNumber));
                 TimerIsActive = false;
-                Round currentRound = await Pairing.MakePairingAsynch(Tournament, Tournament.Rounds.Count + 1, Tournament.Players);
+                Round? currentRound = await Pairing.MakePairingAsynch(Tournament, Tournament.Rounds.Count + 1, Tournament.Players);
+                if (currentRound == null)
+                {
+                    MessageBox.Show("Pairing is not possible, tournament must end.");
+                    await Pairing.SortPlayers(Tournament.Players);
+                    for (int i = 0; i < Tournament.Players.Count; i++)
+                    {
+                        Tournament.Players[i].Result = i + 1;
+                    }
+                    NavigateToResultPage?.Invoke(Tournament);
+                    return;
+                }
+
                 currentRound.Matches.Sort((x, y) => x.TableNumber.CompareTo(y.TableNumber));
                 Tournament.Rounds.Add(currentRound);
                 allMatches = new ObservableCollection<Match>(currentRound.Matches);

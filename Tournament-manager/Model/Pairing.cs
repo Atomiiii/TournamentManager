@@ -82,7 +82,7 @@ namespace Tournament_manager.Model
             }
             return false;
         }
-        public static async Task<Round> MakePairingAsynch(Tournament tournament, int roundNumber, List<Player> players)
+        public static async Task<Round?> MakePairingAsynch(Tournament tournament, int roundNumber, List<Player> players)
         {
             Round round = new Round { RoundNumber = roundNumber };
             await SortPlayers(players);
@@ -92,7 +92,11 @@ namespace Tournament_manager.Model
             int byeIndex = players.Count - 1;
             if (players.Count % 2 != 0)
             {
-                IssueBye(players, ref byeIndex, false);
+                int byeSuccess = IssueBye(players, ref byeIndex, false);
+                if (byeSuccess == 0)
+                {
+                    return null;
+                }
                 Match byeMatch = new Match
                 {
                     TableNumber = 0,
@@ -116,7 +120,7 @@ namespace Tournament_manager.Model
             bool success = MakePairingRec(round, players, 0, new HashSet<Player>(), byePlayer);
             // pairing failed (shouldn't happen)
             if (!success)
-                throw new Exception("Could not create a valid Swiss pairing.");
+                return null;
             // assign tables
             foreach (Match match in round.Matches)
             {
@@ -133,7 +137,7 @@ namespace Tournament_manager.Model
         }
 
         // Issue bye => give bye to older players first so younger can play
-        public static void IssueBye(List<Player> players, ref int byeIndex, bool takeYounglins)
+        public static int IssueBye(List<Player> players, ref int byeIndex, bool takeYounglins)
         {
             while (byeIndex >= 0 &&  (players[byeIndex].HadBye || (!takeYounglins && (players[byeIndex].Division == PlayerDivision.Senior || players[byeIndex].Division == PlayerDivision.Junior))))
             {
@@ -144,12 +148,12 @@ namespace Tournament_manager.Model
                 if (takeYounglins == false)
                 {
                     byeIndex = players.Count - 1;
-                    IssueBye(players, ref byeIndex, true);
-                    return;
+                    return IssueBye(players, ref byeIndex, true);
                 }
-                throw new Exception("No player available for bye."); // should never happen, bcs there are much less rounds then players
+                return 0;
             }
             players[byeIndex].HadBye = true;
+            return 1;
         }
 
     }
