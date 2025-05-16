@@ -104,6 +104,7 @@ namespace Tournament_manager.ViewModel
         {
             if (parameter is not Player targetPlayer)
                 return;
+            MessageBox.Show($"Player {targetPlayer.Name} has been dropped from the tournament.");
             var match = DisplayedMatches.FirstOrDefault(m => m.Player1 == targetPlayer || m.Player2 == targetPlayer);
             Tournament.Players.Remove(targetPlayer);
         }
