@@ -79,6 +79,7 @@ namespace Tournament_manager.Model
                     // Set font which supports special characters (č, š, ř,...)
                     string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
                     PdfFont font = CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
+                    document.SetFont(font);
 
                     document.Add(new Paragraph("Tournament Results")
                         .SetTextAlignment(TextAlignment.CENTER)
