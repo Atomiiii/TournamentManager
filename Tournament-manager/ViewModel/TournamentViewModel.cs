@@ -268,10 +268,11 @@ namespace Tournament_manager.ViewModel
             while (Tournament.RoundTime >= 0 && TimerIsActive)
             {
                 Tournament.RoundTime--;
-                await TimerTick();
                 OnPropertyChanged(nameof(TimerHours));
                 OnPropertyChanged(nameof(TimerMinutes));
                 OnPropertyChanged(nameof(TimerSeconds));
+                await TimerTick();
+                
             }
         }
 
