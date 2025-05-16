@@ -19,12 +19,17 @@ namespace Tournament_manager.Model
                 {
                     return y.Points.CompareTo(x.Points);
                 }
-                else
+                else if (x.Oponents.Count != 0 && y.Oponents.Count != 0)
                 {
                     double xOponentWinrate = x.Oponents.Average(o => o.WinRate);
                     double yOponentWinrate = y.Oponents.Average(o => o.WinRate);
                     return xOponentWinrate.CompareTo(yOponentWinrate);
                 }
+                else
+                {
+                    return x.WinRate.CompareTo(y.WinRate);
+                }
+
             });
         }
 
@@ -130,14 +135,19 @@ namespace Tournament_manager.Model
         // Issue bye => give bye to older players first so younger can play
         public static void IssueBye(List<Player> players, ref int byeIndex, bool takeYounglins)
         {
-            while (players[byeIndex].HadBye || (!takeYounglins && (players[byeIndex].Division == PlayerDivision.Senior || players[byeIndex].Division == PlayerDivision.Junior)))
+            while (byeIndex >= 0 &&  (players[byeIndex].HadBye || (!takeYounglins && (players[byeIndex].Division == PlayerDivision.Senior || players[byeIndex].Division == PlayerDivision.Junior))))
             {
                 byeIndex--;
             }
             if (byeIndex < 0)
             {
-                IssueBye(players, ref byeIndex, true);
-                return;
+                if (takeYounglins == false)
+                {
+                    byeIndex = players.Count - 1;
+                    IssueBye(players, ref byeIndex, true);
+                    return;
+                }
+                throw new Exception("No player available for bye."); // should never happen, bcs there are much less rounds then players
             }
             players[byeIndex].HadBye = true;
         }

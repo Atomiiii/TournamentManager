@@ -19,6 +19,15 @@ namespace Tournament_manager.Model
             int byeShift = 0;
             if (players.Count % 2 != 0)
             {
+                // Not issuing bye to the younglings if possible
+                int byeIndex = players.Count - 1;
+                Pairing.IssueBye(players, ref byeIndex, false);
+                if (byeIndex != players.Count - 1)
+                {
+                    Player temp = players[byeIndex];
+                    players[byeIndex] = players[players.Count - 1];
+                    players[players.Count - 1] = temp;
+                }
                 Match byeMatch = new Match
                 {
                     TableNumber = 0,
