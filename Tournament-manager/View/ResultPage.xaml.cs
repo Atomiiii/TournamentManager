@@ -12,17 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tournament_manager.Model;
+using Tournament_manager.ViewModel;
 
-namespace Tournament_manager.Pages
+namespace Tournament_manager.View
 {
-    /// <summary>
-    /// Interaction logic for Page1.xaml
-    /// </summary>
-    public partial class Page1 : Page
+    public partial class ResultPage : Page
     {
-        public Page1()
+        public ResultPage(Tournament tournament)
         {
             InitializeComponent();
+            DataContext = new ResultPageViewModel(tournament);
         }
     }
 }
